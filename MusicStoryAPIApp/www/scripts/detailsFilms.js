@@ -4,9 +4,16 @@
 // puis exécutez "window.location.reload()" dans la console JavaScript.
 var id = getUrlVars()["id"];
 console.log("id= ", id);
-var movieId;
-var listeVideo = new Array();
-        var $Retour = $('#retour');
+var movieId=new Array(),
+    sex,
+
+// 2. This code loads the IFrame Player API code asynchronously.
+    player,
+    tag = document.createElement('script'),
+    firstScriptTag = document.getElementsByTagName('script')[0],
+    done = false,
+    listeVideo = new Array(),
+    $Retour = $('#btnRetour');
 function getUrlVars() {
     var vars = [], hash; // Déclaration d'un tableau vars et d’une variable "hash"
 
@@ -34,8 +41,10 @@ function getUrlVars() {
     }
     return vars; // retourne le tableau de paramètres
 };
-$Retour.css('border-bottom-right-radius', '100px');
-$Retour.css('z-index', '-10');
+
+$Retour.click(function () {
+    window.location = "index.html";
+});
 (function () {
     "use strict";
 
@@ -45,6 +54,7 @@ $Retour.css('z-index', '-10');
         // Gérer les événements de suspension et de reprise Cordova
         document.addEventListener('pause', onPause.bind(this), false);
         document.addEventListener('resume', onResume.bind(this), false);
+
 
 
        
@@ -58,6 +68,40 @@ $Retour.css('z-index', '-10');
         // TODO: cette application a été réactivée. Restaurez l'état de l'application ici.
     };
 })();
+tag.src = "https://www.youtube.com/iframe_api";
+firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+// 3. This function creates an <iframe> (and YouTube player)
+//    after the API code downloads.
+function onYouTubeIframeAPIReady(id) {
+    player = new YT.Player('player', {
+        height: '360',
+        width: '640',
+        videoId: id,
+        events: {
+            'onReady': onPlayerReady,
+            'onStateChange': onPlayerStateChange
+        }
+    });
+}
+
+// 4. The API will call this function when the video player is ready.
+function onPlayerReady(event) {
+    event.target.playVideo();
+}
+
+// 5. The API calls this function when the player's state changes.
+//    The function indicates that when playing a video (state=1),
+//    the player should play for six seconds and then stop.
+function onPlayerStateChange(event) {
+    if (event.data === YT.PlayerState.PLAYING && !done) {
+        setTimeout(stopVideo, 6000);
+        done = true;
+    }
+}
+function stopVideo() {
+    player.stopVideo();
+}
 (function infoFilm() {
     $.ajax({
 
@@ -66,61 +110,57 @@ $Retour.css('z-index', '-10');
         type: "GET",
         dataType: "json",
         success: function (data) {
-
-
-            console.log("les data du films::", data);
-            $('#listFilm').append("<p class='panel'>" + data.original_title + "</p><img class='col-10' src='https://image.tmdb.org/t/p/w500/" + data.poster_path + "' alt=" + data.original_title + " /><p style='font-size:0.5em'> Synopsis : </br><span style='font-size:0.7em'>" + data.overview + "</span></p><p style='font-size:0.5em'> Sortie :  " + data.release_date + "</p>");
+            $('#listFilm').append("<j class='panel'>" + data.original_title + "</p><img class='col-10' src='https://image.tmdb.org/t/p/w500/" + data.poster_path + "' alt=" + data.original_title + " /><p style='font-size:0.5em'> Synopsis : </br><span style='font-size:0.7em'>" + data.overview + "</span></p><p style='font-size:0.5em'> Sortie :  " + data.release_date + "</p>");
             
         }
     });
-    
-})();
-(function getMovies() {
     $.ajax({
 
-        url: "https://api.themoviedb.org/3/movie/" + id + "/videos?api_key=85a1114cc9bcee8c748abdaaade8169a&language=en-EN",
+        url: "https://api.themoviedb.org/3/movie/" + id + "/credits?api_key=85a1114cc9bcee8c748abdaaade8169a",
         cache: false,
         type: "GET",
         dataType: "json",
         success: function (data) {
-            for (var i = 0; i < data.results.length; i++) {
-                $('#player').append('<iframe class="col-12" id="player" type="text/html" src= "http://www.youtube.com/embed/'+data.results[i].key+'?enablejsapi=1&origin=http://example.com" frameborder= "0" ></iframe >');
+            for (var i = 0; i < data.cast.length; i++) {
+                if (data.cast[i]['gender'] === 0) {
+                    sex = "Non défini";
+                }
+                else if (data.cast[i]['gender'] === 1) {
+                    sex = "Femme";
+                } else sex = "Homme";
+                console.log("les acteurs  :",data.cast[i]['character']);
+                $('#persos').append("<div id='detailsCasting' ><p > Personnage : " + data.cast[i]['character'] + "</br> sexe: " + sex + "</p><p>" + data.cast[i]['name'] + "</p><img class='col-8' src='https://image.tmdb.org/t/p/w500/" + data.cast[i]['profile_path'] + "' alt=" + data.cast[i]['charactere'] +" /><hr /></div>");
+
             }
-            onYouTubePlayerAPIReady;
-            console.log('les vides en liste: ',listeVideo);
-            console.log("les data pour la video: ",data.results.length);
-            console.log("id video::", data.key);
 
         }
     });
 })();
-// Replace the 'ytplayer' element with an <iframe> and
-// YouTube player after the API code downloads.
-var player;
-function onYouTubePlayerAPIReady() {
-    player = new YT.Player('player', {
-        height: auto,
-        width: auto,
-        disablekb: 0,
-        fs: 1,
-        videoId: 'M7lc1UVf-VE'
-    });
-};
-// 4. The API will call this function when the video player is ready.
-function onPlayerReady(event) {
-    event.target.playVideo();
-};
+$('#btnCast').click(function () {
+    if ($('#detailsCasting').css('display') === 'none') {
 
-// 5. The API calls this function when the player's state changes.
-//    The function indicates that when playing a video (state=1),
-//    the player should play for six seconds and then stop.
-var done = false;
-function onPlayerStateChange(event) {
-    if (event.data == YT.PlayerState.PLAYING && !done) {
-        setTimeout(stopVideo, 6000);
-        done = true;
+        $('#detailsCasting').css('display', 'block');
     }
-};
-function stopVideo() {
-    player.stopVideo();
-};
+});
+(function getMovies() {
+    $.ajax({
+
+        url: "https://api.themoviedb.org/3/movie/" + id + "/videos?api_key=85a1114cc9bcee8c748abdaaade8169a&language=en-US",
+        cache: false,
+        type: "GET",
+        dataType: "json",
+        success: function (data) {
+            console.log("les data des videos ::",data);
+            movieId.push(data.results);
+            console.log("la longueur des results  ::", data.results.length);
+            //onYouTubeIframeAPIReady(data.results[i]['key']);
+            for (var i = 0; i < data.results.length+1; i++) {
+                var idVid = data.results[i].key;
+                    $('#player').append('<iframe id="player" src= "http://www.youtube.com/embed/'+data.results[i].key+'?enablejsapi=1" frameborder= "0" ></iframe >');
+            }
+        }       
+    });
+})();
+
+
+

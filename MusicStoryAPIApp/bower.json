@@ -1,5 +1,6 @@
 {
-    "name": "MusicStoryAPIApp",
-    "dependencies": {
-    }
+  "name": "MusicStoryAPIApp",
+  "dependencies": {
+    "angularjs-geolocation": "v0.1.0"
+  }
 }

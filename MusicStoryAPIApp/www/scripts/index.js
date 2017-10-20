@@ -2,14 +2,29 @@
 // http://go.microsoft.com/fwlink/?LinkID=397704
 // Pour déboguer du code durant le chargement d'une page dans cordova-simulate ou sur les appareils/émulateurs Android, lancez votre application, définissez des points d'arrêt, 
 // puis exécutez "window.location.reload()" dans la console JavaScript.
-var catId;
-var nomCategorie;
-var lesCat = new Array();
-var laCat;
-var adress;
-var lesFilms = new Array();
-var idPhoto = new Array();
-var idPop = new Array();
+
+var catId,
+    nomCategorie,
+    lesCat = new Array(),
+    laCat,
+    laPhoto,
+    resultat=new Array(),
+    adress,
+    lesFilms = new Array(),
+    idPhoto = new Array(),
+    idPop = new Array();
+var tabPosition = new Array(Location);
+var tabPop = new Array();
+var $afficher = $('#btn'),
+    $list = $('#listCat'),
+    $btnRecherche = $('#btnRecherche'),
+    $inRecherche = $('#texteRecherche'),
+    $listeCat=new Array(),
+    $pop = $('#popBtn');
+$('#btnFilm').click(function () {
+    listerFilms;
+});
+
 (function () {
     "use strict";
 
@@ -19,22 +34,36 @@ var idPop = new Array();
         // Gérer les événements de suspension et de reprise Cordova
         document.addEventListener( 'pause', onPause.bind( this ), false );
         document.addEventListener( 'resume', onResume.bind( this ), false );
-        var $afficher = $('#btn'),
-            $list = $('#listCat'),
-            $pop = $('#popBtn');
-
         console.log(catId);
+        //$film.click(function () {
+        //    console.log("le tableau des pop:: ", tabPop);
+        //    console.log("la longueur du tablo pop ", tabPop.length);
+        //    for (var i = 0; i < 100; i++) {
+        //        //console.log("le resultat: " + i + "  contient le film :", tabPop[i]['original_title']);
+        //        if (tabPop[i]['backdrop_path'] === null) {
+        //            $('img').css('display', 'none');
+        //        } else var laPhoto = "https://image.tmdb.org/t/p/w500/" + tabPop[i]['backdrop_path'];
+        //        $('#listFilm').append("<img class='col-6'  id=" + tabPop[i]['id'] + " href='detailsFilms.html?id=" + tabPop[i]['id'] + "' src=" + laPhoto + "  alt=" + tabPop[i]['name'] + " />");
+  
+        //    }
+        //})
         $pop.click(function () {
-            filmPopulaires();
+            afficheFilms();
+            
         })
-        $afficher.click(function () {
-            alert('click affiche');
-            listerFilms();
+
+        var $film = $('#btnFilm');
+        $film.click(function () {
+            alert("bouton film");
+            listerFilms;
         });
+        $btnRecherche.click(function () {
+            var laRecherche = encodeURIComponent($inRecherche.val()).replace(/'/g, "%27");
 
-
+            rechercheFilm(laRecherche)
+        });
         $list.change(function () {
-            nomCategorie = $("#listCat option:selected").text();
+            nomCategorie = $("#listCat option:selected").toString();
             
             console.log("longueur tableau: ",lesCat.length);
             for (var i = 0; i < lesCat.length; i++) {
@@ -54,86 +83,178 @@ var idPop = new Array();
             //alert("le num = ",num);
         });
     };
-    (function listeCategories() {
-        console.log("le numero :: ",catId);
-        //alert('fct ok');
+    (function listerFilms() {
+        //alert("fct listerFilms");
         $.ajax({
             url: "https://api.themoviedb.org/3/genre/movie/list?api_key=85a1114cc9bcee8c748abdaaade8169a&language=en-US",
             cache: false,
             type: "GET",
             dataType: "json",
             success: function (data) {
-                lesCat = data.genres;
-                //lesCat = data.genres;
-                console.log("tableau cat::", lesCat);
-                console.log("les genres: ", data.genres[2].name);
-                for (var i = 0; i < data.genres.length; i++) {
-                    
-                    console.log(laCat);
-                    var genre = data.genres[i].name;
-                    //var adress = "https://image.tmdb.org/t/p/w500/" + data.results[i].backdrop_path;
-                    $('#listCat').append($('<option>', { value: i, text: genre.toString() }));
-                    //$('#listFilm').append(" <option value="+data.genres[i].name+">"+data.genres[i].name+"</option>");
-                }
-            
+                $listeCat.push(data);
             }
         });
-    })();
-    function listerFilms(id) {
-        //alert("fct listerFilms");
-        $.ajax({
-            url: "https://api.themoviedb.org/3/genre/" + id + "/movies?api_key=85a1114cc9bcee8c748abdaaade8169a&language=en-US&include_adult=false&sort_by=created_at.asc",
-            cache: false,
-            type: "GET",
-            dataType: "json",
-            success: function (data) {
-                console.log("les data des films::", data);
-                console.log("nombre de films trouvés", data.total_results);
-                lesFilms = data.object_ids;
-                for (var i = 0; i < data.results.length; i++) {
-                    console.log("la page 2: ",data.results['page'][2]);
-                console.log("les id films", data.results[i]['original_title']);
-                    //var leFilm = getFilm(data.object_ids[0][0]);
-                }
-            }
-        });
-    };
-    function filmPopulaires() {
-        for (var j = 0; j < 50; j++) {
-
+        console.log("ma liste de cat",$listeCat);
+        for (var i = 0; i < $listeCat.length; i++) {
             $.ajax({
-                url: "https://api.themoviedb.org/3/movie/popular?api_key=85a1114cc9bcee8c748abdaaade8169a&language=en-US/&page="+j,
+                url: "https://api.themoviedb.org/3/genre/" + $listeCat[i],
                 cache: false,
                 type: "GET",
                 dataType: "json",
                 success: function (data) {
-                    console.log("les data des films populaires::", data);
-                    console.log("nombre de films trouvés", data.total_results);
-                    lesFilms = data.object_ids;
-                    for (var i = 0; i < data.results.length; i++) {
-                        idPop.push(data.results[i].id);
-                            idPhoto.push(data.results[i].id);
-                            if (data.results[i].backdrop_path==null) {
-                                $('img').css('display', 'none');
-                            } else var laPhoto = "https://image.tmdb.org/t/p/w500/" + data.results[i].backdrop_path;
-                            console.log("adresse photo: ", laPhoto);
-                            $('#listFilm').append("<img class='col-6'  id=" + data.results[i].id + " href='detailsFilms.html?id=" + data.results[i].id + "' src=" + laPhoto + "  alt=" + data.results[i].name + " />");
-                            
-       
-
-
-                        //var leFilm = getFilm(data.object_ids[0][0]);
-                    }
-                    for (var x = 0; x < length; x++) {
-
-                    }
-                console.log("les photo : ",idPhoto);
+                    $listeCat.push(data);
                 }
             });
-
         }
+    })();
+    function recupListFilms() {
+        $.ajax({
+            url: "http://files.tmdb.org/p/exports/movie_ids_04_28_2017.json.gz",
+            cache: false,
+            type: "GET",
+            dataType: "json",
+            success: function (data) {
+                console.log("les data de la liste: ", data);
+
+            }
+        });
+    };
+    function filmsCategorie(id) {
+        $('#listFilm').empty();
+        $.ajax({
+            url: "https://api.themoviedb.org/3/genre/" + id + "/movies?api_key=85a1114cc9bcee8c748abdaaade8169a&language=fr-FR&include_adult=false&sort_by=created_at.desc",
+            cache: false,
+            type: "GET",
+            dataType: "json",
+            success: function (data) {
+                console.log("les resultat de la categorie: "+id,data.results);
+                resultat.push(data.results);
+                console.log("le tableau resultat: ", resultat);
+                for (var i = 0; i < resultat.length; i++) {
+                    for (var j = 0; j < resultat[i].length; j++) {
+                        $('#listFilm').append("<img class='col-4' id='" + resultat[i][j]['id'] + "' src=" + laPhoto + " alt=" + resultat[i][j]['original_title'] + " />");
+                        if (resultat[i][j]['poster_path'] !== null) {
+                            laPhoto = "https://image.tmdb.org/t/p/w500" + resultat[i][j]['backdrop_path'];
+                        }
+                        else if (resultat[i][j]['backdrop_path'] !== null) {
+                            laPhoto = "https://image.tmdb.org/t/p/w500" + resultat[i][j]['poster_path'];
+                        }
+                        else $(data[i][j].id).css('display', 'none');
+
+                    }
+                }
+                console.log("le tableau 0 :", resultat[0][0]['poster_path']);
+                for (var i = 0; i < resultat[0]['length']; i++) {
+                    var idPhoto = resultat[0][i]['id'];
+                    console.log("le nom : ", resultat[0][i]['original_title']);
+
+                }
+            }
+
+        });
     }
-    $('body').on('click', 'img', function () { location="detailsFilms.html?id="+this.id })
+    function rechercheFilm(nom) {
+        var resultat = new Array();
+        console.log("le nom :", nom);
+        var laPhoto;
+        $('#listFilm').empty();
+        $.ajax({
+            url: "https://api.themoviedb.org/3/search/multi?api_key=85a1114cc9bcee8c748abdaaade8169a&language=fr-FR&query=" + encodeURIComponent($('#texteRecherche').val()).replace(/'/g, "%27")+"&page=1&include_adult=false",
+            cache: false,
+            type: "GET",
+            dataType: "json",
+            success: function (data) {
+                resultat.push(data.results);
+                console.log("le tableau resultat: ", resultat);
+                console.log("le tableau 0 :",resultat[0][0]['poster_path']);
+                for (var i = 0; i < resultat[0]['length']; i++) {
+                    var idPhoto = resultat[0][i]['id'];
+                    console.log("le nom : ", resultat[0][i]['original_title']);
+                    if (resultat[0][i]['backdrop_path'] !== null) {
+                        laPhoto = "https://image.tmdb.org/t/p/w500" + resultat[0][i]['backdrop_path'];
+                    }
+                    else if (resultat[0][i]['poster_path'] !== null) {
+                        laPhoto = "https://image.tmdb.org/t/p/w500" + resultat[0][i]['poster_path'];
+                    }
+                    else $(data[0][i]['id']).css('display','none');
+                    
+                    $('#listFilm').append("<img class='col-4' id=" + resultat[0][i]['id'] + " src=" + laPhoto + " alt=" + resultat[0][i]['original_title'] + " />");
+                }
+            }
+
+        });
+        console.log("les resultats: ", resultat);
+    }
+    (function listeCategories() {
+        
+        $.ajax({
+            url: "https://api.themoviedb.org/3/genre/movie/list?api_key=85a1114cc9bcee8c748abdaaade8169a&language=en-US",
+            cache: false,
+            type: "GET",
+            dataType: "json",
+            success: function (data) {
+      
+               
+                for (var i = 0; i < data.genres.length; i++) {
+                    $('#drop').append("<li type='button' action='"+filmsCategorie(data.genres[i]['id'])+"' id="+data.genres[i]['name']+">" + data.genres[i]['name'] + "</li>");
+                }
+                }
+        });
+    })();
+    (function test() {
+        $.getJSON("https://api.themoviedb.org/3/movie/popular?api_key=85a1114cc9bcee8c748abdaaade8169a&language=en-US/&page=1", function (data) {
+            var expected = ['id', 'original_title', 'backdrop_path', 'poster_path',]
+        })
+    });
+    (function filmPopulaires() {
+        for (var i = 0; i < 20; i++) {
+
+            $.ajax({
+                url: "https://api.themoviedb.org/3/movie/popular?api_key=85a1114cc9bcee8c748abdaaade8169a&language=en-US/&page="+i+"",
+                cache: false,
+                type: "GET",
+                dataType: "json",
+                success: function (data) {
+                    tabPop.push(data.results);
+                    
+                }
+            })
+        }
+        setTimeout(afficheFilms, 2000);
+        
+    })();
+    function afficheFilms() {
+        console.log("le tableau: ", tabPop);
+        console.log("la longueur du tableau : ",tabPop.length);
+        for (var i = 0; i < tabPop.length; i++) {
+            console.log("premiere boucle :: ",tabPop[i][0]['original_title']);
+            for (var j = 0; j < tabPop.length; j++) {
+                
+                //console.log("le film : ",tabPop[i][j]['original_title']);
+                //var iPhoto = "https://image.tmdb.org/t/p/w500" + tabPop[j]['backdrop_path'];
+               
+                //$('#listFilm').append('<img class="col-4" src="' + iPhoto + '" id="' + tabPop[j]['id'] + '" style="height:80px;" alt="' + tabPop[j]["original_title"] + '" />');
+                //if (tabPop[j]['backdrop_path'] == null) {
+                //    $(tabPop[j]['id']).css('display', 'none');
+                //}
+
+
+            
+                var iPhoto = "https://image.tmdb.org/t/p/w500" + tabPop[i][j]['backdrop_path'];
+
+                $('#listFilm').append('<img class="col-4" src="' + iPhoto + '" id="' + tabPop[i][j]['id'] + '"alt="' + tabPop[i][j]["original_title"] + '" />');
+                //if (tabPop[i][j]['backdrop_path'] == null) {
+                //    if (tabPop[i][j]['poster_path']!=null) {
+                //        var iPhoto = "https://image.tmdb.org/t/p/w500" + tabPop[i][j]['poster_path'];
+                //    }
+                //    $(tabPop[i][j]['id']).css('display', 'none');
+                //} var iPhoto = "https://image.tmdb.org/t/p/w500" + tabPop[i][j]['backdrop_path'];
+        }
+        }
+        
+    }
+    $('body').on('click', 'img', function () { location = "detailsFilms.html?id=" + this.id });
+    $('body').on('click', 'li', function () { filmsCategorie(this.id);})
     function getFilm(id) {
         $.ajax({
             
@@ -146,12 +267,13 @@ var idPop = new Array();
                 $('#listFilm').append("<p> " + data.name + "</p>");
             }
         });
-    }
+    };
     function onPause() {
         // TODO: cette application a été suspendue. Enregistrez l'état de l'application ici.
     };
 
     function onResume() {
         // TODO: cette application a été réactivée. Restaurez l'état de l'application ici.
+        
     };
 } )();

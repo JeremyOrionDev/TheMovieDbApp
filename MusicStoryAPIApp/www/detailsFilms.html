@@ -13,27 +13,15 @@
     <script src="https://www.youtube.com/iframe_api"></script>
 </head>
 <body>
-    <div class="pos-f-t" >
-        <div class="collapse" id="navbarToggleExternalContent" style="color:aliceblue">
-            <div class="bg-dark">
-                <input type="text" name="inputrecherche" value="" />
-                <button class="btn-sm">rechercher</button>
-            </div>
-        </div>
-    </div>
-    <nav class="navbar navbar-dark bg-dark" >
-        <button class="navbar-toggler nav-divider " type="button" data-toggle="collapse" data-target="#navbarToggleExternalContent" aria-controls="navbarToggleExternalContent" aria-expanded="true" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon-dark"></span>
-        </button>
 
-        <span class="navbar-toggle" style="red"></span>
-        <button  class="btn-toolbar" value="Retour"/>
-        <button class="btn-toolbar"> Films</button>
-        <button class=" btn-primary" id="popBtn">Populaires</button>
+    <nav class="navbar navbar-dark bg-dark" >
+        <input type="button" id="btnRetour" class="btn-success" value="Retour" />
+
     </nav>
     <div class="container">
-        <div class="col-12" id="listFilm"></div>
-        <div id="player"></div>
+        <div class="col" id="listFilm"></div>
+        <div class="col-12" id="persos"><input type='button' class='btn' id='btnCast' value='Casting'></div>
+        <div id="player" class="col-12"></div>
     </div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script type="text/javascript" src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=" crossorigin="anonymous"></script>
