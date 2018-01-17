@@ -110,7 +110,7 @@ function stopVideo() {
         type: "GET",
         dataType: "json",
         success: function (data) {
-            $('#listFilm').append("<j class='panel'>" + data.original_title + "</p><img class='col-10' src='https://image.tmdb.org/t/p/w500/" + data.poster_path + "' alt=" + data.original_title + " /><p style='font-size:0.5em'> Synopsis : </br><span style='font-size:0.7em'>" + data.overview + "</span></p><p style='font-size:0.5em'> Sortie :  " + data.release_date + "</p>");
+            $('#listFilm').append("<p class='panel'>" + data.original_title + "</p><img class='col-10' src='https://image.tmdb.org/t/p/w500" + data.poster_path + "' alt=" + data.original_title + " /><p style='font-size:0.5em'> Synopsis : </br><span style='font-size:0.7em'>" + data.overview + "</span></p><p style='font-size:0.5em'> Sortie :  " + data.release_date + "</p>");
             
         }
     });
