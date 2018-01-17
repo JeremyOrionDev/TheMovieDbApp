@@ -13,25 +13,7 @@ tabPop = new Array(), $afficher = $('#btn'), $list = $('#listCat'),$btnRecherche
 $('#btnFilm').click(function () {
     listerFilms;
 });
-function populateDB(tx) {
-    alert("la liste 1" + "\n" + listePop[0][0]);
-   
-    tx.executeSql('DROP TABLE IF EXISTS film');
 
-    tx.executeSql('CREATE TABLE IF NOT EXISTS film (id unique,adult,backdrop ,genre1,genre2,genre3,langue,titreOriginal,resume,poster,duree,dateSortie,titre2,video,budget,Production,Pays,recette)');
-
-    tx.executeSql('CREATE TABLE IF NOT EXISTS acteur(id unique,birthday,deathday,gender,page, name, placeOfBirth, popularity)');
-
-
-    tx.executeSql('INSERT INTO film(id,adult,backdrop ,genre1 ,genre2 ,genre3 ,langue ,titreOriginal,resume ,poster ,duree ,dateSortie ,titre2 ,video ,budget ,Production ,Pays ,recette ) VALUES (' + listePop[1]['id'] + ',' + adult + ',' + listePop[1]['backdrop_path'] + ' ,' + listePop[1]['genre_ids'][0] + ' ,' + listePop[1]['genre_ids'][1] + ' ,' + listePop[1]['genre_ids'][2] + ', ,' + listePop[1]['original_title'] + ',' + listePop[1]['overview'] + ',' + listePop[1]['poster_path'] + ', ,' + listePop[1]['release_date'] + ',' + listePop[1]['title'] + ',' + listePop[1]['video'] + ',,,,)');
-    for (var i = 0; i < 20; i++) {
-        var adult;
-        if (data['results'][i]['adult']) { adult = 0 } else adult = 1;
-        alert("titre = "+listePop[i]['title']);
-        tx.executeSql('INSERT INTO film(id,adult,backdrop ,genre1 ,genre2 ,genre3 ,langue ,titreOriginal,resume ,poster ,duree ,dateSortie ,titre2 ,video ,budget ,Production ,Pays ,recette ) VALUES ('+listePop[i]['id'] + ',' + adult + ',' + listePop[i]['backdrop_path'] + ' ,' + listePop[i]['genre_ids'][0] + ' ,' + listePop[i]['genre_ids'][1] + ' ,' + listePop[i]['genre_ids'][2] + ', ,' + listePop[i]['original_title'] + ',' + listePop[i]['overview'] + ',' + listePop[i]['poster_path'] + ', ,' + listePop[i]['release_date'] + ',' + listePop[i]['title'] + ',' + listePop[i]['video'] + ',,,,)');
-    };
-
-};
 function chargePop() {
 
 }
@@ -58,6 +40,25 @@ function successCB() {
 
 
 
+function populateDB(tx) {
+    alert("la liste 1" + "\n" + listePop[0][0]);
+
+    tx.executeSql('DROP TABLE IF EXISTS film');
+
+    tx.executeSql('CREATE TABLE IF NOT EXISTS film (id unique,adult,backdrop ,genre1,genre2,genre3,langue,titreOriginal,resume,poster,duree,dateSortie,titre2,video,budget,Production,Pays,recette)');
+
+    tx.executeSql('CREATE TABLE IF NOT EXISTS acteur(id unique,birthday,deathday,gender,page, name, placeOfBirth, popularity)');
+
+
+    tx.executeSql('INSERT INTO film(id,adult,backdrop ,genre1 ,genre2 ,genre3 ,langue ,titreOriginal,resume ,poster ,duree ,dateSortie ,titre2 ,video ,budget ,Production ,Pays ,recette ) VALUES (' + listePop[1]['id'] + ',' + adult + ',' + listePop[1]['backdrop_path'] + ' ,' + listePop[1]['genre_ids'][0] + ' ,' + listePop[1]['genre_ids'][1] + ' ,' + listePop[1]['genre_ids'][2] + ', ,' + listePop[1]['original_title'] + ',' + listePop[1]['overview'] + ',' + listePop[1]['poster_path'] + ', ,' + listePop[1]['release_date'] + ',' + listePop[1]['title'] + ',' + listePop[1]['video'] + ',,,,)');
+    for (var i = 0; i < 20; i++) {
+        var adult;
+        if (data['results'][i]['adult']) { adult = 0 } else adult = 1;
+        alert("titre = " + listePop[i]['title']);
+        tx.executeSql('INSERT INTO film(id,adult,backdrop ,genre1 ,genre2 ,genre3 ,langue ,titreOriginal,resume ,poster ,duree ,dateSortie ,titre2 ,video ,budget ,Production ,Pays ,recette ) VALUES (' + listePop[i]['id'] + ',' + adult + ',' + listePop[i]['backdrop_path'] + ' ,' + listePop[i]['genre_ids'][0] + ' ,' + listePop[i]['genre_ids'][1] + ' ,' + listePop[i]['genre_ids'][2] + ', ,' + listePop[i]['original_title'] + ',' + listePop[i]['overview'] + ',' + listePop[i]['poster_path'] + ', ,' + listePop[i]['release_date'] + ',' + listePop[i]['title'] + ',' + listePop[i]['video'] + ',,,,)');
+    };
+
+};
     function onDeviceReady() {
         // Gérer les événements de suspension et de reprise Cordova
         document.addEventListener( 'pause', onPause.bind( this ), false );
@@ -74,7 +75,8 @@ function successCB() {
             success: function (data) {
 
                 listePop = data['results'];
-                alert("nb " + listePop.length);
+                console.log("liste pop",listePop);
+                alert("nom film "+listePop['1']['title']);
             }
         });
         db.transaction(populateDB, errorCB, successCB);
